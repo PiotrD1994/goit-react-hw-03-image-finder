@@ -1,58 +1,94 @@
 import React, { Component } from "react";
-import Searchbar from "./Searchbar/Searchbar"
-import ImageGallery from './ImageGallery/ImageGallery'
-import Modal from './Modal/Modal'
-import Button from './Button/Button'
-import Loader from './Loader/Loader'
-import axios from 'axios'
-
+import Searchbar from "./Searchbar/Searchbar";
+import ImageGallery from "./ImageGallery/ImageGallery";
+import Modal from "./Modal/Modal";
+import Loader from "./Loader/Loader";
+import fetchImages from "./Api/Api";
 
 class App extends Component {
- state = {
- images: [],
- selectedImages: null,
- loading: false,
- }
+  state = {
+    query: "",
+    images: [],
+    page: 1,
+    loader: false,
+    largeImageURL: null,
+    allImages: null,
+  };
 
- handleSearch = (query) => {
-  const apiKey= '39267664-2bc18c2ff9f132c4867ec917a'
-  const apiUrl = `https://pixabay.com/api/?q=${query}&page=1&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=12`;
- axios.get(apiUrl).then((response) => {
-  const images = response.data.hits.map((item) => ({
-    id: item.id,
-    webformatURL: item.webformatURL,
-    largeImageURL: item.largeImageURL,
-  }))
-  this.setState({images, loading: false})
- }).catch((error) => {
-  console.error('Error during APi download:', error)
-  this.setState({ images:[], loading: false})
- })
-}
+  async componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.query !== this.state.query ||
+      prevState.page !== this.state.page
+    ) {
+      try {
+        const dataImages = await fetchImages(
+          this.state.query,
+          this.state.page
+        );
+        setTimeout(() => {
+          this.setState((state) => ({
+            images: [...state.images, ...dataImages.hits],
+            loader: false,
+            allImages: dataImages.totalHits,
+          }));
+        }, 1000);
+      } catch (error) {
+        console.log(error);
+        this.setState({ loader: false });
+      }
+    }
+  }
 
- handleImageClick = (image) => {
-  this.setState({selectedImage: image})
- }
+  handleSubmit = (currentQuery) => {
+    if (this.state.query === currentQuery) {
+      return;
+    }
+    this.setState({
+      query: currentQuery,
+      images: [],
+      page: 1,
+      loader: true,
+    });
+  };
 
- closeImageModal = () => {
-  this.setState({selectedImage:null})
- }
+  btnLoadMore = () => {
+    this.setState((prevState) => ({
+      page: prevState.page + 1,
+      loader: !prevState.loader,
+    }));
+  };
 
- render () {
-  const {images, selectedImage, loading} = this.state
+  handleImageClick = (newLargeImageURL) => {
+    this.setState({ largeImageURL: newLargeImageURL });
+  };
 
-  return (
-    <div>
-      <Searchbar onSubmit={this.handleSearch}/>
-      {loading ? (
-        <Loader/>
-        ): (<ImageGallery images={images} onImageClick={this.handleImageClick}/>)}
-        {selectedImage && (
-          <Modal image={selectedImage} onClose={this.closeImageModal}/>
+  closeImageModal = () => {
+    this.setState({ largeImageURL: null });
+  };
+
+  render() {
+    const { images, largeImageURL, allImages, loader } = this.state;
+
+    return (
+      <div>
+        <Searchbar onSubmit={this.handleSubmit} />
+        {images.length > 0 && (
+          <div>
+            <ImageGallery images={images} onHandleImageClick={this.handleImageClick} />
+            {images.length < allImages ? (
+              <button onClick={this.btnLoadMore}>Load More</button>
+            ) : (
+              <p>No more images</p>
+            )}
+          </div>
         )}
-    </div>
-  )
- }
+        {loader && <Loader />}
+        {largeImageURL && (
+          <Modal onCloseImageModal={this.closeImageModal} largeImage={largeImageURL} />
+        )}
+      </div>
+    );
+  }
 }
 
-export default App
+export default App;
