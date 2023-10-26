@@ -8,6 +8,7 @@ const ImageGallery = ({images, onImageClick}) => {
         {images.map((image) => (
           <ImageGalleryItem
             key={image.id}
+            alt={image.tags}
             image={image}
             onImageClick={onImageClick}
           />
