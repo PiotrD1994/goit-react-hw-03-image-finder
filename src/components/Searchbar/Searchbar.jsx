@@ -7,10 +7,10 @@ class Searchbar extends Component {
     }
 
     handleInputChange = (event) => {
-        this.setState({ query: event.target.value})
+        this.setState({ query: event.CurrentTarget.value})
     }
 
-    handleFormatSubmit = (event) => {
+    handleFormSubmit = (event) => {
         event.preventDefault()
         const {query} = this.state
         if(query.trim() !=='') {

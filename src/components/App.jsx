@@ -4,6 +4,7 @@ import ImageGallery from "./ImageGallery/ImageGallery";
 import Modal from "./Modal/Modal";
 import Loader from "./Loader/Loader";
 import fetchImages from "./Api/Api";
+import Button from './Button/Button'
 
 class App extends Component {
   state = {
@@ -76,7 +77,7 @@ class App extends Component {
           <div>
             <ImageGallery images={images} onHandleImageClick={this.handleImageClick} />
             {images.length < allImages ? (
-              <button onClick={this.btnLoadMore}>Load More</button>
+              <Button onClick={this.btnLoadMore}/>
             ) : (
               <p>No more images</p>
             )}
