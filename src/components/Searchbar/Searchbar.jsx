@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types';
 
 class Searchbar extends Component {
@@ -7,7 +7,7 @@ class Searchbar extends Component {
     }
 
     handleInputChange = (event) => {
-        this.setState({ query: event.CurrentTarget.value})
+        this.setState({ query: event.target.value})
     }
 
     handleFormSubmit = (event) => {

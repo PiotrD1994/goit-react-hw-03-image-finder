@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Searchbar from "./Searchbar/Searchbar";
 import ImageGallery from "./ImageGallery/ImageGallery";
-import Modal from "./Modal/Modal";
 import Loader from "./Loader/Loader";
 import fetchImages from "./Api/Api";
 import Button from './Button/Button'
@@ -32,7 +31,7 @@ class App extends Component {
             loader: false,
             allImages: dataImages.totalHits,
           }));
-        }, 1000);
+        }, 200);
       } catch (error) {
         console.log(error);
         this.setState({ loader: false });
@@ -60,22 +59,22 @@ class App extends Component {
   };
 
   handleImageClick = (newLargeImageURL) => {
-    this.setState({ largeImageURL: newLargeImageURL });
+    this.setState({ largeImageURL: newLargeImageURL});
   };
 
   closeImageModal = () => {
-    this.setState({ largeImageURL: null });
+    this.setState({ largeImageURL: null});
   };
 
   render() {
-    const { images, largeImageURL, allImages, loader } = this.state;
+    const { images, allImages, loader} = this.state;
 
     return (
       <div>
         <Searchbar onSubmit={this.handleSubmit} />
         {images.length > 0 && (
           <div>
-            <ImageGallery images={images} onHandleImageClick={this.handleImageClick} />
+            <ImageGallery images={images} onImageClick={this.handleImageClick} />
             {images.length < allImages ? (
               <Button onClick={this.btnLoadMore}/>
             ) : (
@@ -84,9 +83,6 @@ class App extends Component {
           </div>
         )}
         {loader && <Loader />}
-        {largeImageURL && (
-          <Modal onCloseImageModal={this.closeImageModal} largeImage={largeImageURL} />
-        )}
       </div>
     );
   }
