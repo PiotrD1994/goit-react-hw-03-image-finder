@@ -1,15 +1,25 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
-
+import * as basicLightbox from 'basiclightbox';
+import 'basiclightbox/dist/basicLightbox.min.css';
 
 class Modal extends Component {
+  lightbox = null;
+
   componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
+    this.lightbox = basicLightbox.create(`
+      <div class="modal">
+        <img src="${this.props.largeImageURL}" alt="${this.props.tags}">
+      </div>
+    `);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
+    this.lightbox && this.lightbox.close();
+  }
+
+  openLightbox = () => {
+    this.lightbox && this.lightbox.show();
   }
 
   handleKeyDown = (event) => {
@@ -25,14 +35,15 @@ class Modal extends Component {
   }
 
   render() {
+    const { largeImageURL, tags } = this.props;
 
-    const {largeImageURL, tags} = this.props
     return (
-      <div className='Overlay' onClick={this.handleBackdropClick}>
-        <div className='modal'>
+      <div className="Overlay" onClick={this.handleBackdropClick}>
+        <div className="modal">
           <img
             src={largeImageURL}
             alt={tags}
+            onClick={this.openLightbox}
           />
         </div>
       </div>
@@ -41,9 +52,9 @@ class Modal extends Component {
 }
 
 Modal.propTypes = {
-    largeImageURL: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired,
-    onClose: PropTypes.func.isRequired,
-  };
+  largeImageURL: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export default Modal;
